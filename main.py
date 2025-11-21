@@ -10,7 +10,7 @@ def load_cookies():
     try:
         with open(COOKIE_FILE, 'r') as f:
             cookies = json.load(f)
-            print(f"Loaded cookies from file: {list(cookies.keys())}")
+            print(f"[i] Loaded cookies from file: {list(cookies.keys())}")
             return cookies
     except:
         return {}
@@ -18,29 +18,29 @@ def load_cookies():
 def save_cookies(cookies_dict):
     with open(COOKIE_FILE, "w") as f:
         json.dump(cookies_dict, f, indent=2)
-    print(f"Cookies saved to {COOKIE_FILE}")
+    print(f"[+] Cookies saved to {COOKIE_FILE}")
 
 def validate_cookies(cookies):
     if not cookies or "session" not in cookies:
-        print("No session cookie found")
+        print("[!] No session cookie found")
         return False
     session = requests.Session()
     for name, value in cookies.items():
         session.cookies.set(name, value, domain="www.nanoo.tv", path="/")
     try:
-        print("Validating cookies...")
+        print("[i] Validating cookies...")
         response = session.get("https://www.nanoo.tv/", timeout=10)
         if response.status_code == 200 and "nanoo.tv" in response.text:
-            print("Validation successful!")
+            print("[+] Validation successful!")
             return True
-        print("Validation failed")
+        print("[i] Validation failed")
         return False
     except Exception as e:
-        print(f"Validation error: {e}")
+        print(f"[!] Validation error: {e}")
         return False
 
 def get_authenticated_cookies():
-    print("Launching Microsoft login window...")
+    print("[i] Launching Microsoft login window...")
     cookies_collected = []
     login_complete = [False]
     
@@ -48,11 +48,11 @@ def get_authenticated_cookies():
         time.sleep(0.1)
         current_url = window.get_current_url()
         if current_url and current_url.startswith('https://www.nanoo.tv/') and '/sso/' not in current_url and not login_complete[0]:
-            print("Login detected, extracting cookies...")
+            print("[i] Login detected, extracting cookies...")
             login_complete[0] = True
             nonlocal cookies_collected
             cookies_collected = window.get_cookies()
-            print(f"Extracted {len(cookies_collected)} cookies")
+            print(f"[i] Extracted {len(cookies_collected)} cookies")
             time.sleep(1)
             window.destroy()
 
@@ -60,38 +60,38 @@ def get_authenticated_cookies():
     window.events.loaded += on_loaded
     webview.start()
     
-    print(f"Webview closed. Processing {len(cookies_collected)} cookies...")
+    print(f"[i] Webview closed. Processing {len(cookies_collected)} cookies...")
     cookies_dict = {}
     for cookie in cookies_collected:
         if isinstance(cookie, SimpleCookie):
             for key, morsel in cookie.items():
                 cookies_dict[key] = morsel.value
-                print(f"Extracted cookie: {key} = {morsel.value[:20]}...")
+                print(f"[+] Extracted cookie: {key} = {morsel.value[:20]}...")
     
     if cookies_dict:
         save_cookies(cookies_dict)
         return cookies_dict
     else:
-        print("No cookies extracted!")
+        print("[i] No cookies extracted!")
         return {}
 
 if __name__ == "__main__":
     cookies = load_cookies()
     
     if not validate_cookies(cookies):
-        print("\nCookies invalid or expired. Logging in...")
+        print("\n[i] Cookies invalid or expired. Logging in...")
         cookies = get_authenticated_cookies()
         if not cookies or "session" not in cookies:
-            print("Failed to get valid cookies!")
+            print("[!] Failed to get valid cookies!")
             exit(1)
     else:
-        print("Using existing valid cookies\n")
+        print("[i] Using existing valid cookies\n")
 
     session = requests.Session()
     for name, value in cookies.items():
         session.cookies.set(name, value, domain="www.nanoo.tv", path="/")
 
-    url = input("Input URL: ").strip()
+    url = input("[>] Input URL: ").strip()
     video_id = url.strip("/").split("/")[-1]
     
     headers = {
@@ -100,9 +100,9 @@ if __name__ == "__main__":
         "Referer": "https://www.nanoo.tv/"
     }
     
-    print("Visiting video page to authorize session...")
+    print("[i] Visiting video page to authorize session...")
     page_response = session.get(url, headers=headers, timeout=10)
-    print(f"Page visit status: {page_response.status_code}")
+    print(f"[i] Page visit status: {page_response.status_code}")
     
     session_cookie = cookies.get("session")
     api_url = f"https://www.nanoo.tv/api/v1/recordings/{video_id}|{session_cookie}/media"
@@ -121,8 +121,8 @@ if __name__ == "__main__":
                 break
     
     if not mp4_url:
-        print("Error: No video found")
+        print("[!] Error: No video found")
         print(data.get('data', {}).get('title', ''))
         exit(1)
 
-    print(mp4_url)
+    print(f"[+] Video URL Found: \n {mp4_url}")
