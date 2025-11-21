@@ -45,9 +45,8 @@ def get_authenticated_cookies():
     login_complete = [False]
     
     def on_loaded():
-        time.sleep(1.5)
+        time.sleep(0.1)
         current_url = window.get_current_url()
-        print(f"Current URL: {current_url}")
         if current_url and current_url.startswith('https://www.nanoo.tv/') and '/sso/' not in current_url and not login_complete[0]:
             print("Login detected, extracting cookies...")
             login_complete[0] = True
