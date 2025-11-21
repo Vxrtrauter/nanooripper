@@ -126,3 +126,4 @@ if __name__ == "__main__":
         exit(1)
 
     print(f"[+] Video URL Found: \n {mp4_url}")
+    input("Press Enter to exit...")
