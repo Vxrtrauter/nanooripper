@@ -15,7 +15,7 @@ A lightweight Python script that extracts direct MP4 download links from nanoo.t
 
 1. Clone this repository:
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Vxrtrauter/nanooripper
 cd nanooripper
 ```
 
