@@ -44,6 +44,7 @@ The script will output the direct MP4 download link.
 - MP4 links expire after ~24 hours (check the `e=` parameter)
 - The script requires valid nanoo.tv school/institution access
 - Repository is partly coded with AI (Including this README)
+- For a faster Download, use FDM (Free Download Manager) or any other download manager
 
 
 ***
